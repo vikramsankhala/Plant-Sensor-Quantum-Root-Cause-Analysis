@@ -5,6 +5,14 @@ Provides a user-friendly web interface for diagnosing plant sensor anomalies
 using quantum computing optimization.
 """
 
+import sys
+from pathlib import Path
+
+# Add src directory to Python path for Streamlit Cloud deployment
+src_path = Path(__file__).parent / "src"
+if str(src_path) not in sys.path:
+    sys.path.insert(0, str(src_path))
+
 import streamlit as st
 import json
 from typing import List, Dict
