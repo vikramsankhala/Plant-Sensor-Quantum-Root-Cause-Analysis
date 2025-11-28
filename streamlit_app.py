@@ -333,25 +333,230 @@ with tab2:
     something goes wrong, multiple sensors often show abnormal readings simultaneously. This service 
     uses **quantum computing** to analyze all possibilities simultaneously and find the most likely 
     root cause faster.
+    """)
     
-    ### How It Works
+    st.divider()
     
+    st.subheader("🏗️ Technical Architecture")
+    
+    st.markdown("""
+    The system follows a **layered architecture** with clear separation of concerns:
+    """)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        **1. API Layer (FastAPI)**
+        - Handles HTTP requests and responses
+        - Input validation and serialization
+        - Error handling and logging
+        
+        **2. Service Layer**
+        - Orchestrates the diagnosis workflow
+        - Coordinates between layers
+        - Manages configuration
+        """)
+    
+    with col2:
+        st.markdown("""
+        **3. QUBO Layer**
+        - Converts sensor data to optimization problems
+        - Builds energy functions
+        - Encodes to Ising Hamiltonians
+        
+        **4. Quantum Layer**
+        - Executes QAOA algorithm
+        - Manages quantum backends
+        - Handles simulator/hardware selection
+        """)
+    
+    st.markdown("""
+    **5. Data Layer**
+    - Pydantic models for type safety
+    - Data validation and transformation
+    - Pattern library management
+    """)
+    
+    st.divider()
+    
+    st.subheader("⚛️ Quantum vs Classical Computing")
+    
+    st.markdown("""
+    ### Fundamental Differences
+    """)
+    
+    comparison_data = {
+        "Aspect": ["Computation Model", "Problem Exploration", "State Representation", "Parallelism", "Best For"],
+        "Classical Computing": [
+            "Binary bits (0 or 1)",
+            "Sequential evaluation",
+            "Single state at a time",
+            "Simulated parallelism",
+            "Deterministic problems, large datasets"
+        ],
+        "Quantum Computing": [
+            "Quantum bits (superposition)",
+            "Simultaneous exploration",
+            "Multiple states simultaneously",
+            "True quantum parallelism",
+            "Optimization, search, simulation"
+        ]
+    }
+    
+    import pandas as pd
+    st.dataframe(pd.DataFrame(comparison_data), use_container_width=True, hide_index=True)
+    
+    st.markdown("""
+    **Key Insight**: Quantum computers can explore many possible solutions at once using **quantum superposition**, 
+    while classical computers must check solutions one at a time. This gives quantum algorithms a potential 
+    advantage for combinatorial optimization problems like root-cause diagnosis.
+    """)
+    
+    st.divider()
+    
+    st.subheader("🔬 Quantum vs Classical Solvers")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        ### Classical Solvers
+        
+        **Simulated Annealing**
+        - Randomly explores solution space
+        - Gradually "cools down" to find minima
+        - Can get stuck in local optima
+        - Time: O(n²) to O(2ⁿ) depending on problem
+        
+        **Genetic Algorithms**
+        - Evolves population of solutions
+        - Uses mutation and crossover
+        - Good for complex landscapes
+        - Requires many iterations
+        
+        **Integer Programming (Gurobi, CPLEX)**
+        - Exact solutions for small problems
+        - Branch-and-bound techniques
+        - Exponential time for hard problems
+        - Limited by problem size
+        """)
+    
+    with col2:
+        st.markdown("""
+        ### Quantum Solvers (QAOA)
+        
+        **Quantum Approximate Optimization**
+        - Explores solution space in superposition
+        - Uses quantum interference
+        - Can escape local optima naturally
+        - Potential polynomial speedup
+        
+        **Advantages:**
+        - ✅ Parallel exploration of solution space
+        - ✅ Quantum tunneling through barriers
+        - ✅ Natural handling of correlations
+        - ✅ Better for highly constrained problems
+        
+        **Current Limitations:**
+        - ⚠️ Limited qubit count (current hardware)
+        - ⚠️ Noise and error rates
+        - ⚠️ Requires quantum-classical hybrid approach
+        """)
+    
+    st.info("""
+    **For Root-Cause Analysis**: Quantum solvers excel when you have many sensors and patterns with complex 
+    interdependencies. Classical solvers work well for small problems but struggle with the exponential 
+    search space as problem size grows.
+    """)
+    
+    st.divider()
+    
+    st.subheader("🧮 Quantum vs Classical Algorithms")
+    
+    st.markdown("""
+    ### Algorithm Comparison for Root-Cause Diagnosis
+    """)
+    
+    algorithm_comparison = {
+        "Algorithm Type": [
+            "Brute Force (Classical)",
+            "Greedy Search (Classical)",
+            "Dynamic Programming (Classical)",
+            "QAOA (Quantum)"
+        ],
+        "Approach": [
+            "Check all combinations",
+            "Make locally optimal choices",
+            "Break into subproblems",
+            "Quantum superposition + optimization"
+        ],
+        "Time Complexity": [
+            "O(2ⁿ) - Exponential",
+            "O(n²) - Polynomial",
+            "O(n²) to O(2ⁿ)",
+            "O(poly(n)) - Potential speedup"
+        ],
+        "Best For": [
+            "Small problems (<20 variables)",
+            "Problems with optimal substructure",
+            "Problems with overlapping subproblems",
+            "Combinatorial optimization"
+        ]
+    }
+    
+    st.dataframe(pd.DataFrame(algorithm_comparison), use_container_width=True, hide_index=True)
+    
+    st.markdown("""
+    ### Why QAOA for This Problem?
+    
+    1. **Combinatorial Nature**: Root-cause diagnosis involves selecting combinations of patterns - 
+       exactly what QAOA is designed for.
+    
+    2. **Multiple Objectives**: We balance anomaly coverage, pattern parsimony, and consistency - 
+       QAOA's variational approach handles this naturally.
+    
+    3. **Correlations**: Sensors and patterns have complex relationships - quantum entanglement 
+       can capture these correlations better than classical methods.
+    
+    4. **Scalability**: As plants add more sensors and patterns, classical methods slow down 
+       exponentially, while quantum methods may maintain polynomial scaling.
+    """)
+    
+    st.divider()
+    
+    st.subheader("🔄 How It Works")
+    
+    st.markdown("""
     1. **Input**: You provide abnormal sensors and known failure patterns
-    2. **Optimization**: The system converts this into a QUBO (mathematical optimization problem)
-    3. **Quantum Solving**: QAOA algorithm solves it on quantum hardware or simulators
-    4. **Results**: You get ranked root-cause hypotheses with confidence scores
+    2. **QUBO Construction**: The system converts this into a Quadratic Unconstrained Binary Optimization problem
+    3. **Ising Encoding**: QUBO is transformed into an Ising Hamiltonian (quantum physics formulation)
+    4. **Quantum Solving**: QAOA algorithm runs on quantum hardware/simulator
+    5. **Results**: Quantum measurements are decoded into ranked root-cause hypotheses with confidence scores
+    """)
     
-    ### Technology Stack
+    st.divider()
     
+    st.subheader("💻 Technology Stack")
+    
+    st.markdown("""
     - **Python 3.10+** - Primary language
     - **Qiskit** - Quantum SDK for QAOA and IBM Quantum integration
     - **FastAPI** - REST API backend
     - **Streamlit** - Web interface
     - **Pydantic** - Type-safe data validation
+    - **IBM Quantum** - Quantum hardware access (optional)
+    - **Qiskit Aer** - Quantum simulators for development
+    """)
     
-    ### Repository
+    st.divider()
     
+    st.subheader("📚 Repository")
+    
+    st.markdown("""
     [GitHub Repository](https://github.com/vikramsankhala/Plant-Sensor-Quantum-Root-Cause-Analysis)
+    
+    For detailed architecture documentation, see [ARCHITECTURE.md](https://github.com/vikramsankhala/Plant-Sensor-Quantum-Root-Cause-Analysis/blob/main/ARCHITECTURE.md)
     """)
 
 with tab3:
